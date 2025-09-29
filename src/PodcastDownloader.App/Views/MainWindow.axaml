@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PodcastDownloader.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignWidth="1100"
+        d:DesignHeight="700"
+        x:Class="PodcastDownloader.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Podcast Downloader">
+
+    <Window.Resources>
+        <DataTemplate x:Key="PodcastItemTemplate" x:DataType="vm:PodcastItemViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="4">
+                <Border Width="56" Height="56" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush2}">
+                    <Image Source="{Binding Artwork}" Stretch="UniformToFill" ClipToBounds="True" />
+                </Border>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" MaxLines="2" Opacity="0.8" />
+                        <TextBlock Text="{Binding DownloadSummary}" FontSize="11" />
+                        <TextBlock Text="{Binding SyncStatusText}" FontSize="11" Opacity="0.8" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EpisodeItemTemplate" x:DataType="vm:EpisodeItemViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="4">
+                <Border Width="64" Height="64" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush2}">
+                    <Image Source="{Binding Artwork}" Stretch="UniformToFill" ClipToBounds="True" />
+                </Border>
+                <StackPanel Spacing="4" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding PublishedAt, StringFormat='{}{0:MMM dd, yyyy hh:mm tt}'}" FontSize="11" Opacity="0.7" />
+                        <TextBlock Text="{Binding Duration, StringFormat='Duration: {0:c}'}" FontSize="11" Opacity="0.7" IsVisible="{Binding Duration}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" MaxLines="2" Opacity="0.8" />
+                    <ProgressBar Minimum="0" Maximum="1" Value="{Binding DownloadProgress}" IsVisible="{Binding IsDownloading}" Height="6" />
+                    <TextBlock Text="{Binding StatusText}" FontSize="11" Opacity="0.8" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+    <DataTemplate x:Key="SearchResultItemTemplate" x:DataType="vm:PodcastSearchResultViewModel">
+            <Border Margin="4" Padding="12" CornerRadius="8" Background="{DynamicResource ThemeBackgroundBrush2}">
+                <Grid ColumnDefinitions="* Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="6">
+                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding Author}"
+                               FontSize="12"
+                               Opacity="0.8"
+                               IsVisible="{Binding Author}" />
+                    <TextBlock Grid.Row="2"
+                               Text="{Binding Description}"
+                               TextWrapping="Wrap"
+                               MaxLines="3"
+                               Opacity="0.8" />
+                    <StackPanel Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Center" Spacing="8">
+            <Button Content="Subscribe"
+                Command="{Binding SubscribeCommand}"
+                CommandParameter="{Binding}"/>
+                        <TextBlock Text="{Binding FeedUrl}" FontSize="11" Opacity="0.7" TextWrapping="Wrap" MaxWidth="200" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,* ,Auto"
+          ColumnDefinitions="2*,3*"
+          Margin="16">
+    <Border Grid.ColumnSpan="2"
+                Margin="0 0 0 12"
+                Padding="12"
+                CornerRadius="8"
+        Background="{DynamicResource ThemeAccentBrush}">
+          <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBox Width="400"
+             Watermark="Enter podcast RSS feed URL"
+             Text="{Binding FeedUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Content="Subscribe"
+            Command="{Binding SubscribeCommand}"
+            MinWidth="120" />
+                    <Button Content="Refresh"
+                            Command="{Binding RefreshCommand}"
+                            MinWidth="100" />
+                <Button Content="Refresh All"
+                    Command="{Binding RefreshAllPodcastsCommand}"
+                    MinWidth="120" />
+                    <Button Content="Remove"
+                            Command="{Binding RemoveCommand}"
+                            MinWidth="100" />
+                    <Button Content="Download"
+                            Command="{Binding DownloadCommand}"
+                            MinWidth="120" />
+            <Button Content="Download All"
+                Command="{Binding DownloadAllCommand}"
+                MinWidth="140" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="Busy" IsVisible="{Binding IsBusy}" FontSize="12" />
+                        <ProgressBar IsIndeterminate="True" Width="80" Height="6" IsVisible="{Binding IsBusy}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                    <TextBlock Text="Download folder:" VerticalAlignment="Center" Margin="0 0 8 0" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding DownloadRootPath}"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               MaxWidth="500" />
+                    <Button Grid.Column="2"
+                            Content="Change..."
+                            Command="{Binding ChangeDownloadFolderCommand}"
+                            Margin="12 0 0 0"
+                            MinWidth="120" />
+                </Grid>
+
+                <Expander Header="Discover podcasts" IsExpanded="True">
+                    <StackPanel Spacing="12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBox Width="400"
+                                     Watermark="Search for podcasts"
+                                     Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Content="Search"
+                                    Command="{Binding SearchCommand}"
+                                    MinWidth="120" />
+                <Button Content="Clear"
+                    MinWidth="100"
+                    Command="{Binding ClearSearchResultsCommand}" />
+                        </StackPanel>
+                        <ListBox x:Name="SearchResultsList"
+                                 ItemsSource="{Binding SearchResults}"
+                                 SelectedItem="{Binding SelectedSearchResult, Mode=TwoWay}"
+                                 ItemTemplate="{StaticResource SearchResultItemTemplate}"
+                                 MaxHeight="240" />
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </Border>
+
+    <Border Grid.Row="1"
+                Margin="0 0 12 0"
+                Padding="12"
+                CornerRadius="8"
+                Background="{DynamicResource ThemeBackgroundBrush}">
+            <Grid RowDefinitions="Auto,*">
+                <TextBlock Text="Podcasts" FontSize="18" FontWeight="SemiBold" />
+                <ListBox Grid.Row="1"
+                         Margin="0 12 0 0"
+                         ItemsSource="{Binding Podcasts}"
+                         SelectedItem="{Binding SelectedPodcast, Mode=TwoWay}"
+                         ItemTemplate="{StaticResource PodcastItemTemplate}" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Padding="12"
+                CornerRadius="8"
+                Background="{DynamicResource ThemeBackgroundBrush}">
+            <Grid RowDefinitions="Auto,*">
+                <Grid ColumnDefinitions="Auto,*" Margin="0 0 0 12">
+                    <Border Width="140"
+                            Height="140"
+                            CornerRadius="8"
+                            Background="{DynamicResource ThemeBackgroundBrush2}">
+                        <Image Source="{Binding SelectedPodcast.Artwork}"
+                               Stretch="UniformToFill"
+                               ClipToBounds="True" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12 0 0 0" Spacing="6">
+                        <TextBlock Text="{Binding SelectedPodcast.Title, FallbackValue=Select a podcast, TargetNullValue=Select a podcast}" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding SelectedPodcast.Description, TargetNullValue=Choose a podcast to see details, FallbackValue=Choose a podcast to see details}"
+                                   TextWrapping="Wrap"
+                                   MaxHeight="80"
+                                   Opacity="0.8" />
+                    </StackPanel>
+                </Grid>
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding SelectedPodcast.Episodes, TargetNullValue={x:Null}}"
+                         SelectedItem="{Binding SelectedEpisode, Mode=TwoWay}"
+                         ItemTemplate="{StaticResource EpisodeItemTemplate}" />
+            </Grid>
+        </Border>
+
+    <Border Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Padding="8"
+                CornerRadius="6"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+            <TextBlock Text="{Binding StatusMessage}" />
+        </Border>
+    </Grid>
+</Window>
