@@ -1,6 +1,6 @@
 # Podcast Downloader
 
-A cross-platform desktop application built with [Avalonia UI](https://avaloniaui.net/) and .NET 8 for subscribing to podcast feeds, browsing episodes, and downloading them for offline listening.
+A cross-platform desktop application built with [Avalonia UI](https://avaloniaui.net/) and .NET 8 for discovering podcasts, subscribing to feeds, browsing episodes, and downloading them for offline listening.
 
 ## Project layout
 
@@ -24,34 +24,35 @@ PodcastDownloader/
 
 ```powershell
 cd PodcastDownloader
- dotnet build PodcastDownloader.sln
+dotnet build PodcastDownloader.sln
 ```
 
 ### Run the desktop app
 
 ```powershell
 cd PodcastDownloader
- dotnet run --project src/PodcastDownloader.App
+dotnet run --project src/PodcastDownloader.App
 ```
 
 ### Run tests
 
 ```powershell
 cd PodcastDownloader
- dotnet test
+dotnet test
 ```
 
 ## Key features
 
-- **MVVM-first UI** with Avalonia, leveraging CommunityToolkit MVVM for observable state and async commands.
-- **Core domain layer** exposing podcast/episode models, feed parsing, download management, and storage services.
-- **Dependency injection** via `Microsoft.Extensions.DependencyInjection` with typed `HttpClient` instances for feed parsing and media downloads.
-- **Pluggable persistence** through `IPodcastRepository`, with an in-memory default and a filesystem storage service for downloaded media.
-- **Unit tests** covering podcast subscription and download flows.
+- **Podcast discovery** powered by Apple's public Search API, letting you explore new shows and subscribe directly from the app.
+- **MVVM-first UI** with Avalonia and CommunityToolkit MVVM, including per-podcast download indicators, episode progress bars, and a global "Refresh All" action.
+- **Persistent storage** via a JSON-backed repository that stores relative paths beneath a user-configurable download root for portability.
+- **Media management** that caches podcast artwork, organizes episodes and artwork in per-podcast folders, and supports single or bulk episode downloads with progress feedback.
+- **Core domain services** for feed parsing, download orchestration, and storage abstraction, all wired with dependency injection and typed `HttpClient` instances.
+- **Unit tests** covering repository persistence, discovery integration, and download workflows.
 
 ## Next steps
 
-- Persist subscriptions to disk (e.g., JSON or LiteDB repository).
-- Enhance the UI with artwork previews, search, and filtering.
-- Queue and track multiple downloads concurrently with cancellation controls.
-- Integrate notifications when new episodes are available.
+- Offer additional discovery providers (e.g., Podcast Index) and richer filtering options.
+- Add scheduled background refreshes and notifications when new episodes arrive.
+- Introduce smarter download queue management with pause/resume and bandwidth controls.
+- Expose import/export for OPML or backup/restore of subscriptions.
